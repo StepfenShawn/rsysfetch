@@ -1,7 +1,7 @@
 [package]
 name = "rsysfetch"
-version = "0.1.2"
-edition = "2024"
+version = "0.1.3"
+edition = "2021"
 description = "Yet another system information command tool simply implemented in Rust🦀 with ratatui."
 authors = ["Stepfen Shawn"]
 license = "MIT"
