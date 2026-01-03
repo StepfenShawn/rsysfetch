@@ -3,9 +3,12 @@ Yet another system information command tool simply implemented in Rust🦀 with 
 
 ![alt text](example/image.png)
 
-# Usage
+# Install
 ```
 cargo install rsysfetch
+```
+and then:  
+```
 rsysfetch
 ```
 
