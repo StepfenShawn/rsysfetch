@@ -34,7 +34,7 @@ pub fn get_logo() -> Vec<Line<'static>> {
 
     lines.push(Line::from(""));
     lines.push(Line::from(Span::styled(
-        "sysfetch-rs",
+        "rsysfetch",
         Style::default()
             .fg(Color::White)
             .add_modifier(Modifier::BOLD),

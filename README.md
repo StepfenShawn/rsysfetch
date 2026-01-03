@@ -1,11 +1,11 @@
-# sysfetch-rs
+# rsysfetch
 Yet another system information command tool simply implemented in Rust🦀 with ratatui.  
 
 ![alt text](example/image.png)
 
 # Usage
 ```
-cargo run -r
+cargo install rsysfetch
 ```
 
 enjoy it!  

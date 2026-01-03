@@ -8,7 +8,6 @@ use ratatui::{
 
 use crate::app::App;
 use crate::logo;
-use crate::system_info::format_bytes;
 
 pub fn draw(f: &mut Frame, app: &App) {
     let size = f.size();
@@ -45,7 +44,10 @@ fn draw_all_system_info(f: &mut Frame, area: ratatui::layout::Rect, app: &App) {
                     .fg(Color::Cyan)
                     .add_modifier(Modifier::BOLD),
             ),
-            Span::raw(format!("{} {}", info.os_name, info.os_version)),
+            Span::raw(format!(
+                "{} {}, {}",
+                info.os_name, info.os_version, info.os_arch
+            )),
         ]),
         Line::from(vec![
             Span::styled(
@@ -97,8 +99,7 @@ fn draw_all_system_info(f: &mut Frame, area: ratatui::layout::Rect, app: &App) {
         }
 
         let cpu_name = format!(
-            "  - CPU {}: {} ({} cores) @ {:.2}GHz",
-            i + 1,
+            "{} ({} cores) @ {:.2}GHz",
             cpu.model
                 .split_whitespace()
                 .take(4)
@@ -108,7 +109,15 @@ fn draw_all_system_info(f: &mut Frame, area: ratatui::layout::Rect, app: &App) {
             cpu.frequency as f64 / 1000.0
         );
 
-        text.push(Line::from(vec![Span::raw(cpu_name)]));
+        text.push(Line::from(vec![
+            Span::styled(
+                format!("  - CPU {}: ", i + 1),
+                Style::default()
+                    .fg(Color::Yellow)
+                    .add_modifier(Modifier::BOLD),
+            ),
+            Span::raw(cpu_name),
+        ]));
     }
 
     for (i, gpu) in info.gpus.iter().enumerate() {
@@ -121,9 +130,15 @@ fn draw_all_system_info(f: &mut Frame, area: ratatui::layout::Rect, app: &App) {
             )));
         }
 
-        let gpu_name = format!("  - GPU {}: {}", i + 1, gpu.name);
-
-        text.push(Line::from(vec![Span::raw(gpu_name)]));
+        text.push(Line::from(vec![
+            Span::styled(
+                format!("  - GPU {}: ", i + 1),
+                Style::default()
+                    .fg(Color::Yellow)
+                    .add_modifier(Modifier::BOLD),
+            ),
+            Span::raw(gpu.name.clone()),
+        ]));
     }
 
     text.push(Line::from(""));
@@ -158,31 +173,11 @@ fn draw_all_system_info(f: &mut Frame, area: ratatui::layout::Rect, app: &App) {
         )),
     ]));
 
-    let disk_percent = if info.disk_total > 0 {
-        (info.disk_used as f64 / info.disk_total as f64 * 100.0) as u16
-    } else {
-        0
-    };
-    text.push(Line::from(vec![
-        Span::styled(
-            "  Disk (/): ",
-            Style::default()
-                .fg(Color::Cyan)
-                .add_modifier(Modifier::BOLD),
-        ),
-        Span::raw(format!(
-            "{} / {} ({}%)",
-            format_bytes(info.disk_used),
-            format_bytes(info.disk_total),
-            disk_percent
-        )),
-    ]));
-
     let paragraph = Paragraph::new(text)
         .block(
             Block::default()
                 .borders(Borders::ALL)
-                .title("System Information")
+                .title("Environments")
                 .title_alignment(Alignment::Center)
                 .title_style(
                     Style::default()

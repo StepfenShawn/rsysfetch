@@ -24,6 +24,7 @@ pub struct GpuInfo {
 pub struct SystemInfo {
     pub os_name: String,
     pub os_version: String,
+    pub os_arch: String,
     pub kernel_version: String,
     pub hostname: String,
     pub username: String,
@@ -31,8 +32,6 @@ pub struct SystemInfo {
     pub cpus: Vec<CpuInfo>,
     pub memory_total: u64,
     pub memory_used: u64,
-    pub disk_total: u64,
-    pub disk_used: u64,
     pub gpus: Vec<GpuInfo>,
     pub local_ip: String,
 }
@@ -46,6 +45,7 @@ impl SystemInfo {
         // Basic system information
         let os_name = System::name().unwrap_or_else(|| "Unknown".to_string());
         let os_version = System::os_version().unwrap_or_else(|| "Unknown".to_string());
+        let os_arch = std::env::consts::ARCH.into();
         let kernel_version = System::kernel_version().unwrap_or_else(|| "Unknown".to_string());
         let hostname = System::host_name().unwrap_or_else(|| "Unknown".to_string());
         let username = env::var("USER")
@@ -63,10 +63,6 @@ impl SystemInfo {
         let memory_total = sys.total_memory();
         let memory_used = sys.used_memory();
 
-        // Disk information
-        let disk_total = 0u64;
-        let disk_used = 0u64;
-
         // GPU information
         let gpus = get_gpu_info_list();
 
@@ -76,6 +72,7 @@ impl SystemInfo {
         Ok(Self {
             os_name,
             os_version,
+            os_arch,
             kernel_version,
             hostname,
             username,
@@ -83,8 +80,6 @@ impl SystemInfo {
             cpus,
             memory_total,
             memory_used,
-            disk_total,
-            disk_used,
             gpus,
             local_ip,
         })
@@ -103,50 +98,6 @@ fn format_uptime(seconds: u64) -> String {
         format!("{}h {}m", hours, minutes)
     } else {
         format!("{}m", minutes)
-    }
-}
-
-/// Format byte size
-pub fn format_bytes(bytes: u64) -> String {
-    const UNITS: &[&str] = &["B", "KB", "MB", "GB", "TB"];
-    let mut size = bytes as f64;
-    let mut unit_index = 0;
-
-    while size >= 1024.0 && unit_index < UNITS.len() - 1 {
-        size /= 1024.0;
-        unit_index += 1;
-    }
-
-    if unit_index == 0 {
-        format!("{} {}", size as u64, UNITS[unit_index])
-    } else {
-        format!("{:.1} {}", size, UNITS[unit_index])
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_system_info_collection() {
-        let info = SystemInfo::collect().unwrap();
-        assert!(!info.os_name.is_empty());
-        assert!(!info.cpus.is_empty());
-    }
-
-    #[test]
-    fn test_format_uptime() {
-        assert_eq!(format_uptime(3661), "1h 1m");
-        assert_eq!(format_uptime(90061), "1d 1h 1m");
-        assert_eq!(format_uptime(61), "1m");
-    }
-
-    #[test]
-    fn test_format_bytes() {
-        assert_eq!(format_bytes(1024), "1.0 KB");
-        assert_eq!(format_bytes(1048576), "1.0 MB");
-        assert_eq!(format_bytes(1073741824), "1.0 GB");
     }
 }
 

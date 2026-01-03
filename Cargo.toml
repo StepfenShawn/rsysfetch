@@ -1,5 +1,5 @@
 [package]
-name = "sysfetch-rs"
+name = "rsysfetch"
 version = "0.1.0"
 edition = "2024"
 description = "Yet another system information command tool simply implemented in Rust🦀 with ratatui."
